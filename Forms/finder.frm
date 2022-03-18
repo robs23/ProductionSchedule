@@ -26,7 +26,7 @@ Me.Hide
 
 End Sub
 
-Private Sub txtSearch_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal shift As Integer)
+Private Sub txtSearch_KeyUp(ByVal KeyCode As MsForms.ReturnInteger, ByVal shift As Integer)
 keyWord = Me.txtSearch
 If Len(keyWord) >= 1 Then
     Set fRecords = currentSchedule.filterRecordset(keyWord)

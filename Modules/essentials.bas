@@ -156,7 +156,7 @@ On Error GoTo err_trap
 
 Set v = col(ind)
 
-Exit_here:
+exit_here:
 If isError Then
     inCollection = False
 Else
@@ -166,7 +166,7 @@ Exit Function
 
 err_trap:
 isError = True
-Resume Exit_here
+Resume exit_here
 
 
 End Function

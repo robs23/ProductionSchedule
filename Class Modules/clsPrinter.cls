@@ -41,13 +41,13 @@ defaultPrinter = Application.ActivePrinter
 PriterString = pPrinterName & " na " & pPrinterPort & ":"
 Application.ActivePrinter = PriterString
 
-Exit_here:
+exit_here:
 Application.ActivePrinter = defaultPrinter
 Exit Function
 
 err_trap:
 PriterString = pPrinterName & " on " & pPrinterPort & ":"
-Resume Exit_here
+Resume exit_here
 
 End Function
 

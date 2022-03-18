@@ -120,12 +120,12 @@ Else
     Next S
 End If
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""ClearTrace"" of Runtime. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -151,14 +151,14 @@ If Not rs.EOF Then
 End If
 rs.Close
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 closeConnection
 Exit Function
 
 err_trap:
 MsgBox "Error in ""getLatestVersion"" of Runtime. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 
 End Function

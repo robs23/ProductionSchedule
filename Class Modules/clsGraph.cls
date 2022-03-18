@@ -78,12 +78,12 @@ Else
     pyValues(UBound(pyValues)) = yValue
 End If
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""append"" of clsGraph. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 

@@ -1,11 +1,12 @@
 ﻿VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} updater 
    Caption         =   "Opcje aktualizacji"
-   ClientHeight    =   6075
+   ClientHeight    =   6072
    ClientLeft      =   45
-   ClientTop       =   375
+   ClientTop       =   390
    ClientWidth     =   6870
    OleObjectBlob   =   "updater.frx":0000
+   ShowModal       =   0   'False
    StartUpPosition =   1  'CenterOwner
 End
 Attribute VB_Name = "updater"
@@ -43,6 +44,46 @@ updateRegistry regPath & "TitleString", titleStr
 Application.Caption = titleStr & Abs(DateDiff("h", Now, updatedOn)) & " godz. temu"
 End Sub
 
+Private Sub btnListFromClipboard_Click()
+Dim DataObj As MsForms.DataObject
+Dim clip As String
+Dim clips() As String
+Dim ind As String
+Dim i As Integer
+
+Set DataObj = New MsForms.DataObject '<~~ Amended as per jp's suggestion
+
+On Error GoTo err_trap
+
+'~~> Get data from the clipboard.
+DataObj.GetFromClipboard
+'~~> Get clipboard contents
+clip = DataObj.GetText(1)
+clips = split(clip, vbNewLine, , vbTextCompare)
+
+For i = 0 To UBound(clips) - 1
+    If Len(clips(i)) > 0 Then
+        ind = ind & clips(i) & ","
+    End If
+Next i
+
+If Len(ind) > 0 Then ind = Left(ind, Len(ind) - 1)
+
+Me.txtZfinList = ind
+
+exit_here:
+Exit Sub
+   
+err_trap:
+If Err <> 0 Then MsgBox "Data on clipboard is not text or is empty"
+Resume exit_here
+
+End Sub
+
+Private Sub btnRemoveList_Click()
+Me.txtZfinList.value = ""
+End Sub
+
 Private Sub btnUpdate_Click()
 Dim rs As ADODB.Recordset
 Dim rsSplit As ADODB.Recordset
@@ -62,7 +103,7 @@ Dim hhour As Integer
 Dim splitBy As String
 Dim tblName As String
 Dim verStr As String
-Dim theMode As Integer '1-prazenie, 2-mielenie, 3-pakowanie, 4-palety,5-opakowania
+Dim theMode As Integer '1-prazenie, 2-mielenie, 3-pakowanie, 4-palety,5-opakowania, 6-lista
 
 On Error GoTo err_trap
 
@@ -87,6 +128,7 @@ If verify Then
     updateRegistry regPath & "Bean", Me.cmbBean
     updateRegistry regPath & "Decafe", Me.cmbDecaf
     updateRegistry regPath & "ShowComments", Me.cmbComments
+    updateRegistry regPath & "ZfinList", Me.txtZfinList.value
     If Me.optWeek Then
         updateRegistry regPath & "dateRangeType", "Weekly"
     Else
@@ -139,23 +181,22 @@ If verify Then
             & "FROM tbOperations o LEFT JOIN " & tblName & " od ON od.operationId=o.operationId LEFT JOIN tbZfin z ON z.zfinId=o.zfinId LEFT JOIN tbMachine m ON m.machineId=od.plMach LEFT JOIN tbZfinProperties zp ON zp.zfinId=z.zfinId LEFT JOIN tbUom u ON u.zfinId=z.zfinId LEFT JOIN tbCustomerString cs ON cs.custStringId = z.custString LEFT JOIN tbPallets p ON p.palletId=u.palletType " _
             & "WHERE od.plMoment >= '" & dFrom & "' AND od.plMoment < '" & dTo & "' AND o.type = 'p' " & verStr
     ElseIf Me.cmbType = "Opakowania" Then
-        sql = "DECLARE @dateFrom datetime, " _
-            & "@dateTo datetime " _
-            & "SET @dateFrom = '" & dFrom & "' " _
-            & "SET @dateTo = '" & dTo & "' " _
-            & "SELECT o.mesId, theBom.bomRecId, o.zfinId, o.mesString, theBom.materialId, mat.zfinIndex, mat.zfinName, mat.zfinType, od.plMoment,od.plShift, m.machineName as Maszyna, (od.plAmount/theBom.pcPerPallet) * theBom.amount as matAmount, theBom.unit, CASE WHEN matType.materialTypeName IS NULL THEN 'Nieznany' ELSE matType.materialTypeName END as Kategoria,zp.[beans?] as bean,zp.[decafe?] as decaf, 'Wszystkie' as brak,zfin.zfinIndex as iZfin, zfin.zfinName as nZfin " _
-            & "FROM tbOperations o LEFT JOIN " & tblName & " od ON od.operationId=o.operationId LEFT JOIN tbMachine m ON m.machineId=od.plMach LEFT JOIN tbZfin zfin ON zfin.zfinId=o.zfinId LEFT JOIN " _
+        sql = "SELECT o.mesId, theBom.bomRecId, o.zfinId, o.mesString, theBom.materialId, mat.zfinIndex, mat.zfinName, mat.zfinType, od.plMoment,od.plShift, m.machineName as Maszyna, (od.plAmount/theBom.pcPerPallet) * theBom.amount as matAmount, theBom.unit, CASE WHEN matType.materialTypeName IS NULL THEN 'Nieznany' ELSE matType.materialTypeName END as Kategoria,zp.[beans?] as bean,zp.[decafe?] as decaf, 'Wszystkie' as brak,z.zfinIndex as iZfin, z.zfinName as nZfin " _
+            & "FROM tbOperations o LEFT JOIN " & tblName & " od ON od.operationId=o.operationId LEFT JOIN tbMachine m ON m.machineId=od.plMach LEFT JOIN tbZfin z ON z.zfinId=o.zfinId LEFT JOIN " _
             & "(SELECT bomy.*, freshBom.dateAdded, (u.unitWeight*u.pcPerPallet) as KG_PAL, u.pcPerPallet FROM tbBom bomy RIGHT JOIN " _
             & "(SELECT oBom.zfinId,  MAX(oBom.bomRecId) as bomRecId, MAX(oBom.dateAdded) as dateAdded FROM " _
             & "(SELECT iBom.bomRecId, zfinId, br.dateAdded FROM tbBomReconciliation br JOIN ( " _
             & "SELECT bomRecId, zfinId " _
             & "FROM tbBom bom " _
             & "GROUP BY bomRecId, zfinId) iBom ON iBom.bomRecId=br.bomRecId) oBom " _
-            & "WHERE oBom.dateAdded <=@dateTo " _
+            & "WHERE oBom.dateAdded <= '" & dTo & "' " _
             & "GROUP BY oBom.zfinId) freshBom ON freshBom.zfinId=bomy.zfinId AND freshBom.bomRecId=bomy.bomRecId " _
             & "LEFT JOIN tbUom u ON u.zfinId=bomy.zfinId) theBom ON theBom.zfinId=o.zfinId LEFT JOIN tbZfin mat ON mat.zfinId=theBom.materialId LEFT JOIN tbMaterialType matType ON mat.materialType=matType.materialTypeId " _
             & "LEFT JOIN tbZfinProperties zp ON zp.zfinId=o.zfinId " _
-            & "WHERE od.plMoment >= @dateFrom AND od.plMoment < @dateTo AND o.type = 'p' AND mat.zfinType = 'zpkg' " & verStr
+            & "WHERE od.plMoment >= '" & dFrom & "' AND od.plMoment < '" & dTo & "' AND o.type = 'p' AND mat.zfinType = 'zpkg' " & verStr
+    End If
+    If Len(Me.txtZfinList.value) > 0 Then
+        sql = sql & " AND z.zfinIndex IN (" & Me.txtZfinList.value & ")"
     End If
     If Me.cmbBean = "Tylko ziarno" Then
         sql = sql & " AND zp.[beans?]=1 "
@@ -240,7 +281,7 @@ If verify Then
     rs.Close
 End If
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 Set rsSplit = Nothing
 closeConnection
@@ -251,7 +292,7 @@ Exit Sub
 
 err_trap:
 MsgBox "Error in ""btnUupdate_Click"" of ""Updater"". Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -315,14 +356,14 @@ If bool Then
     End If
 End If
 
-Exit_here:
+exit_here:
 verify = bool
 Exit Function
 
 err_trap:
 MsgBox "Error in ""Verify"" of ""Updater"". Error number: " & Err.Number & ", " & Err.Description
 bool = False
-Resume Exit_here
+Resume exit_here
 
 End Function
 
@@ -591,6 +632,8 @@ regval = registryKeyExists(regPath & "ShowComments")
 If regval <> False Then Me.cmbComments = regval
 regval = registryKeyExists(regPath & "TotalIndex")
 If regval <> False Then Me.cmbTotalIndex = regval
+regval = registryKeyExists(regPath & "ZfinList")
+If regval <> False Then Me.txtZfinList = regval
 regval = registryKeyExists(regPath & "dateRangeType")
 If regval <> False Then
     If regval = "Weekly" Then
@@ -649,6 +692,7 @@ Me.cmbType.AddItem "Pakowanie"
 Me.cmbType.AddItem "Prażenie"
 Me.cmbType.AddItem "Palety"
 Me.cmbType.AddItem "Opakowania"
+Me.cmbType.AddItem "Lista"
 
 For i = Me.cmbSplit.ListCount To 1 Step -1
     Me.cmbSplit.RemoveItem i
@@ -1009,12 +1053,12 @@ Do Until currentDate > dTo
 Loop
 headerAddress = sht.Range(sht.Cells(1, 1), sht.Cells(3, x)).Address
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""CreateHeader"" of updater. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -1073,14 +1117,14 @@ If bool Then
     rs.Close
 End If
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 disconnectScada
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""getRoastingBatches"" of updater. Error number: " & Err.Number & ", " & Err.Description, vbOKOnly + vbCritical, "Error"
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -1143,14 +1187,14 @@ If Me.optWeek = True Then
 
 End If
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 closeConnection
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""loadVersions"" of updater. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 

@@ -70,12 +70,12 @@ If Not IsMissing(materialType) Then
 End If
 
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""Initiaize"" of clsSplitterItem. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -98,12 +98,12 @@ End If
 '    pMaterialType = materialType
 'End If
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""append"" of clsSplitterItem. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -143,12 +143,12 @@ If Not bool Then
     pShiftObjects.add newShift, ref
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""newShift"" of clsSplitterItem. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 

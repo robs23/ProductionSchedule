@@ -192,12 +192,12 @@ Do Until rs.EOF
     rs.MoveNext
 Loop
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""Initialize"" of clsSchedule. Error Number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -221,12 +221,12 @@ If Not bool Then
     splitters.add newSplitter, name
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""newSplitter"" of clsSchedule. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 
@@ -282,12 +282,12 @@ If Not bool Then
     records.add cRecord, CStr(index & "_" & sheet)
 End If
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""newRecord"" of clsSchedule. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -430,12 +430,12 @@ For Each splitter In splitters
     graphs.add graph, graph.sheetName
 Next splitter
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""createGraphs"" of clsSchedule. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -460,12 +460,12 @@ If Not bool Then
     operations.add cOperation, CStr(id)
 End If
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""newOperation"" of clsSchedule. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 

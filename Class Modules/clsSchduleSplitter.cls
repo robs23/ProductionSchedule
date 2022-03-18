@@ -56,12 +56,12 @@ If Not bool Then
     pItems.add newItem, CStr(index)
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""newItem"" of clsSchduleSplitter. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 
@@ -191,12 +191,12 @@ Else
     getShiftColumn = Null
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""GetShiftColumn"" of clsSchduleSplitter. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 
@@ -220,12 +220,12 @@ If Not bool Then
     shiftTotals.add newTotalOnShift, ref
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""newTotalOnShift"" of clsSchduleSplitter. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 
@@ -319,12 +319,12 @@ End If
 
 total = tot
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""Total"" of clsSchduleSplitter. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 

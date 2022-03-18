@@ -1,10 +1,10 @@
 ﻿VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} tracer 
    Caption         =   "Rysuj ślad"
-   ClientHeight    =   1650
-   ClientLeft      =   45
-   ClientTop       =   375
-   ClientWidth     =   4710
+   ClientHeight    =   1320
+   ClientLeft      =   30
+   ClientTop       =   270
+   ClientWidth     =   3750
    OleObjectBlob   =   "tracer.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -95,14 +95,14 @@ Else
     MsgBox "Coś poszło nie tak. Spróbuj najpierw aktualizować harmonogram i następnie skorzystaj z rysowania śladu", vbInformation + vbOKOnly, "Coś nie pykło"
 End If
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 closeConnection
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""loadVersions"" of tracer. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
@@ -128,6 +128,7 @@ End Sub
 
 Private Sub getPlan()
 Dim regval As Variant
+Dim zfinList As Variant
 Dim bool As Boolean
 Dim sql As String
 Dim rs As ADODB.Recordset
@@ -209,6 +210,13 @@ If regval <> False And regval <> "" Then
             & "LEFT JOIN tbZfinProperties zp ON zp.zfinId=o.zfinId " _
             & "WHERE od.plMoment >= @dateFrom AND od.plMoment < @dateTo AND o.type = 'p' AND mat.zfinType = 'zpkg' And od.operDataVer = " & Me.cmbVersions
     End If
+    regval = registryKeyExists(regPath & "ZfinList")
+    If regval <> False And regval <> "" Then
+        If Len(regval) > 0 Then
+            sql = sql & " AND z.zfinIndex IN (" & regval & ")"
+        End If
+    End If
+    
     regval = registryKeyExists(regPath & "SplitBy")
     If regval <> False And regval <> "" Then
         split = regval
@@ -429,7 +437,7 @@ Else
     MsgBox "Coś poszło nie tak. Spróbuj najpierw aktualizować harmonogram i następnie skorzystaj z rysowania śladu", vbInformation + vbOKOnly, "Coś nie pykło"
 End If
 
-Exit_here:
+exit_here:
 Set rs = Nothing
 Application.ScreenUpdating = True
 Application.StatusBar = ""
@@ -438,7 +446,7 @@ Exit Sub
 
 err_trap:
 MsgBox "Error in ""getPlan"" of tracer. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 

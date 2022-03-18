@@ -22,12 +22,12 @@ pName = name
 pSheet = sheet
 Set pLocation = location
 
-Exit_here:
+exit_here:
 Exit Sub
 
 err_trap:
 MsgBox "Error in ""Initiaize"" of clsRecord. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 

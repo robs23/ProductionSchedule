@@ -82,12 +82,12 @@ If Not bool Then
     pDetails.add newDetail, CStr(name)
 End If
 
-Exit_here:
+exit_here:
 Exit Function
 
 err_trap:
 MsgBox "Error in ""newDetail"" of clsShift. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Function
 

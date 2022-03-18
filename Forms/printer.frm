@@ -194,7 +194,7 @@ Else
     End If
 End If
 
-Exit_here:
+exit_here:
 If sheetExists("HiddenXXX") Then
     Application.DisplayAlerts = False
     ThisWorkbook.Sheets("HiddenXXX").Delete
@@ -207,7 +207,7 @@ Exit Sub
 
 err_trap:
 MsgBox "Error in ""printData"" of printer. Error number: " & Err.Number & ", " & Err.Description
-Resume Exit_here
+Resume exit_here
 
 End Sub
 
